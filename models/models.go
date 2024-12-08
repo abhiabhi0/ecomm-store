@@ -14,10 +14,11 @@ type Cart struct {
 
 // User represents a customer/user of the ecommerce store
 type User struct {
-	ID           int    `json:"id"`
-	Name         string `json:"name"`
-	TotalOrders  int    `json:"total_orders"`
-	DiscountUsed bool   `json:"discount_used"`
+	ID           int      `json:"id"`
+	Name         string   `json:"name"`
+	TotalOrders  int      `json:"total_orders"`
+	DiscountUsed bool     `json:"discount_used"`
+	Coupons      []string `json:"coupons"`
 }
 
 // Order represents an order placed by a user
@@ -34,4 +35,12 @@ type CheckoutResponse struct {
 	CouponCode          string  `json:"coupon_code,omitempty"`
 	OrderNumber         int     `json:"order_number"`
 	AmountAfterDiscount float64 `json:"amount_after_discount"`
+}
+
+// ReportResponse defines the structure of the report for each user
+type ReportResponse struct {
+	TotalItems    int      `json:"total_items"`
+	TotalAmount   float64  `json:"total_amount"`
+	DiscountCodes []string `json:"discount_codes"`
+	TotalDiscount float64  `json:"total_discount"`
 }

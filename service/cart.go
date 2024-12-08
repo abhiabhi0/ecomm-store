@@ -7,7 +7,8 @@ import (
 )
 
 type CartService struct {
-	Store repo.Store
+	Store        repo.Store
+	AdminService *AdminService
 }
 
 func (s *CartService) Checkout(userID int) (*models.CheckoutResponse, error) {
@@ -26,16 +27,15 @@ func (s *CartService) Checkout(userID int) (*models.CheckoutResponse, error) {
 	// Increase total orders
 	user.TotalOrders++
 
-	// Generate coupon every 3rd order
-	var couponCode string
-	if user.TotalOrders%3 == 0 {
-		couponCode = "DISCOUNT10"
-	}
-
 	// Calculate total amount
 	totalAmount := 0.0
 	for _, item := range cart.Items {
 		totalAmount += item.Price
+	}
+
+	couponCode := ""
+	if user.TotalOrders%3 == 0 && user.Coupons != nil && len(user.Coupons) > 0 {
+		couponCode = user.Coupons[0]
 	}
 
 	// Apply discount if coupon is available
