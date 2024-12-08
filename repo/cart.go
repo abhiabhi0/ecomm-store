@@ -14,16 +14,16 @@ type CartStore interface {
 
 // Store holds the cart and order data
 type Store struct {
-	Carts  map[int]models.Cart // User's cart by userID
-	Users  map[int]models.User // Users' information
-	Orders []models.Order      // All orders placed in the store
+	Carts  map[int]models.Cart    // User's cart by userID
+	Users  map[int]models.User    // Users' information
+	Orders map[int][]models.Order // List of orders for each user, keyed by userID
 }
 
 func NewStore() *Store {
 	return &Store{
 		Carts:  make(map[int]models.Cart),
 		Users:  make(map[int]models.User),
-		Orders: []models.Order{},
+		Orders: make(map[int][]models.Order),
 	}
 }
 

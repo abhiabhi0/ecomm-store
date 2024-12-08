@@ -1,10 +1,10 @@
-Here's a sample README document explaining the discount logic and how to call the APIs using `curl`:
+Here’s an updated version of your README, including details about the **Admin API**:
 
 ---
 
 # E-commerce Store API
 
-This is an e-commerce store API that allows users to add items to their cart, checkout, and receive a discount on every third order.
+This is an e-commerce store API that allows users to add items to their cart, checkout, and receive a discount on every third order. Additionally, there are admin endpoints for generating discount codes and viewing reports on user activity.
 
 ## Discount Logic
 
@@ -88,27 +88,77 @@ curl -X GET "http://localhost:8080/v1/cart/checkout?user_id=1"
 #### Response Fields:
 - `user_id`: The ID of the user who placed the order.
 - `total_amount`: The total amount of the cart before applying the discount.
-- `coupon_code`: The generated discount coupon code (if eligible). For every 3rd order, a coupon is applied (e.g., `DISCOUNT10-3`).
+- `coupon_code`: The generated discount coupon code (if eligible). For every 3rd order, a coupon is applied (e.g., `DISCOUNT10`).
 - `order_number`: The current order number of the user.
 - `amount_after_discount`: The total amount after applying the 10% discount (only if the user is eligible for the discount).
 
-### Example Flow
+### 3. **Admin API: Generate Discount Code**
 
-1. **Add Items to Cart**: 
-    - User adds multiple items to their cart.
-    - Example: First add a Laptop, then a Phone, and a Tablet.
-    
-2. **Checkout**: 
-    - After adding items to the cart, the user proceeds to checkout.
-    - If this is the 3rd order, a coupon will be applied automatically and a 10% discount will be calculated.
-    - The response will include the order number, the total amount before the discount, the applied coupon, and the amount after the discount.
+- **URL**: `/v1/admin/discount/generate`
+- **Method**: `POST`
+- **Description**: Generates a discount code for every 3rd order for a user.
 
-### Example Scenario:
-- **User 1**:
-  1. Adds Laptop (Price: 1000.0)
-  2. Adds Phone (Price: 500.0)
-  3. Adds Tablet (Price: 300.0)
-  4. Checkout: Discount applied on 3rd order, total amount after discount is 1620.0 (10% off applied).
+#### Request Parameters:
+- `user_id` (Query Parameter): The ID of the user for whom to generate a discount code.
+
+#### Example Curl Request:
+```bash
+curl -X POST "http://localhost:8080/v1/admin/discount/generate?user_id=1" \
+     -H "Authorization: root"
+```
+
+#### Response:
+- Status: `200 OK`
+- Response Body (JSON):
+    ```json
+    {
+      "user_id": 1,
+      "discount_code": "DISCOUNT10"
+    }
+    ```
+
+#### Response Fields:
+- `user_id`: The ID of the user for whom the discount code was generated.
+- `discount_code`: The generated discount code (e.g., `DISCOUNT10`).
+
+### 4. **Admin API: Get Admin Report**
+
+- **URL**: `/v1/admin/report`
+- **Method**: `GET`
+- **Description**: Provides an admin report containing the count of items purchased, total purchase amount, discount codes used, and total discount amount for each user.
+
+#### Example Curl Request:
+```bash
+curl -X GET "http://localhost:8080/v1/admin/report" \
+     -H "Authorization: root"
+```
+
+#### Response:
+- Status: `200 OK`
+- Response Body (JSON):
+    ```json
+    {
+      "1": {
+        "total_items": 5,
+        "total_amount": 2000.0,
+        "discount_codes": ["DISCOUNT10"],
+        "total_discount": 200.0
+      },
+      "2": {
+        "total_items": 3,
+        "total_amount": 1500.0,
+        "discount_codes": ["DISCOUNT10"],
+        "total_discount": 150.0
+      }
+    }
+    ```
+
+#### Response Fields:
+- For each user (by `user_id`):
+  - `total_items`: The total number of items purchased by the user.
+  - `total_amount`: The total amount spent by the user.
+  - `discount_codes`: A list of discount codes used by the user.
+  - `total_discount`: The total discount amount for the user.
 
 ## Running the API Locally
 
@@ -127,4 +177,4 @@ curl -X GET "http://localhost:8080/v1/cart/checkout?user_id=1"
 
 ---
 
-This README should provide a clear understanding of how the e-commerce API works, how to call the APIs with `curl`, and how the discount logic is implemented.
+This updated README includes the **Admin API** endpoints, as well as instructions for generating discount codes and accessing admin reports, including the `Authorization` requirement (`root` password).

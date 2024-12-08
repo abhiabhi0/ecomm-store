@@ -52,6 +52,17 @@ func (s *CartService) Checkout(userID int) (*models.CheckoutResponse, error) {
 	// Update user order count in store
 	s.Store.Users[userID] = user
 
+	// Create the order struct
+	order := models.Order{
+		UserID: userID,
+		Items:  cart.Items,
+		Total:  totalAmount,
+		Coupon: couponCode,
+	}
+
+	// Add the order to the user's order history
+	s.Store.Orders[userID] = append(s.Store.Orders[userID], order)
+
 	// Clear the cart after checkout
 	s.Store.ClearCart(userID)
 

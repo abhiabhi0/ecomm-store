@@ -31,7 +31,6 @@ func (s *AdminService) GenerateDiscountCode(userID int) error {
 	return nil
 }
 
-// GetAdminReport lists the count of items purchased, total purchase amount, discount codes, and total discount amount
 func (s *AdminService) GetAdminReport() (map[int]models.ReportResponse, error) {
 	report := make(map[int]models.ReportResponse)
 
@@ -43,23 +42,20 @@ func (s *AdminService) GetAdminReport() (map[int]models.ReportResponse, error) {
 		totalDiscount := 0.0
 
 		// Calculate total items and total amount for each user
-		for _, order := range s.Store.Orders {
-			if order.UserID == userID {
-				// Update total items count
-				totalItems += len(order.Items)
+		for _, order := range s.Store.Orders[userID] { // Fix: Iterate over orders specific to each user
+			// Update total items count
+			totalItems += len(order.Items)
 
-				// Update total amount
-				totalAmount += order.Total
+			// Update total amount
+			totalAmount += order.Total
 
-				// Check if the order used a coupon (discount code)
-				if order.Coupon != "" {
-					discountCodes = append(discountCodes, order.Coupon)
+			// Check if the order used a coupon (discount code)
+			if order.Coupon != "" {
+				discountCodes = append(discountCodes, order.Coupon)
 
-					// Assuming the discount amount is stored in the order and is 10% of the total order
-					// You may need to adjust this if the discount logic is more complex.
-					discountAmount := order.Total * 0.10 // 10% discount
-					totalDiscount += discountAmount
-				}
+				// Assuming the discount amount is stored in the order and is 10% of the total order
+				discountAmount := order.Total * 0.10 // 10% discount
+				totalDiscount += discountAmount
 			}
 		}
 
