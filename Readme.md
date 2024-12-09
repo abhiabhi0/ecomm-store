@@ -1,7 +1,3 @@
-Here’s an updated version of your README, including details about the **Admin API**:
-
----
-
 # E-commerce Store API
 
 This is an e-commerce store API that allows users to add items to their cart, checkout, and receive a discount on every third order. Additionally, there are admin endpoints for generating discount codes and viewing reports on user activity.
