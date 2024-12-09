@@ -7,13 +7,12 @@ import (
 )
 
 type CartService struct {
-	Store        repo.Store
-	AdminService *AdminService
+	Store repo.CartStore
 }
 
 func (s *CartService) Checkout(userID int) (*models.CheckoutResponse, error) {
 	// Get the user's data
-	user, exists := s.Store.Users[userID]
+	user, exists := s.Store.GetUser(userID)
 	if !exists {
 		return nil, fmt.Errorf("user not found")
 	}
@@ -24,7 +23,6 @@ func (s *CartService) Checkout(userID int) (*models.CheckoutResponse, error) {
 		return nil, fmt.Errorf("no items in cart")
 	}
 
-	// Increase total orders
 	user.TotalOrders++
 
 	// Calculate total amount
@@ -42,15 +40,11 @@ func (s *CartService) Checkout(userID int) (*models.CheckoutResponse, error) {
 	amountAfterDiscount := totalAmount
 	if couponCode != "" && !user.DiscountUsed {
 		amountAfterDiscount = totalAmount * 0.90 // Apply 10% discount
-		s.Store.Users[userID] = models.User{
-			ID:           user.ID,
-			TotalOrders:  user.TotalOrders,
-			DiscountUsed: true, // Mark discount as used
-		}
+		user.DiscountUsed = true
 	}
 
 	// Update user order count in store
-	s.Store.Users[userID] = user
+	s.Store.SetUser(userID, user)
 
 	// Create the order struct
 	order := models.Order{
@@ -61,7 +55,7 @@ func (s *CartService) Checkout(userID int) (*models.CheckoutResponse, error) {
 	}
 
 	// Add the order to the user's order history
-	s.Store.Orders[userID] = append(s.Store.Orders[userID], order)
+	s.Store.UpdateOrder(userID, order)
 
 	// Clear the cart after checkout
 	s.Store.ClearCart(userID)
@@ -69,9 +63,9 @@ func (s *CartService) Checkout(userID int) (*models.CheckoutResponse, error) {
 	checkoutResponse := &models.CheckoutResponse{
 		UserID:              userID,
 		TotalAmount:         totalAmount,
-		CouponCode:          couponCode,
 		OrderNumber:         user.TotalOrders,
 		AmountAfterDiscount: amountAfterDiscount,
+		CouponCode:          couponCode,
 	}
 
 	return checkoutResponse, nil

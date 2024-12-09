@@ -14,13 +14,12 @@ func main() {
 	// Create an instance of the in-memory cart store
 	store := repo.NewStore()
 
-	cartService := service.CartService{Store: *store}
+	cartService := &service.CartService{Store: store}
 
 	adminService := &service.AdminService{Store: store}
 
 	// Create an instance of CartHandler with the store
 	cartHandler := &handlers.CartHandler{
-		Store:   store,
 		CartSvc: cartService,
 	}
 

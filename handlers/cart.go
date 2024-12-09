@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"ecomm-store/models"
-	"ecomm-store/repo"
 	"ecomm-store/service"
 	"encoding/json"
 	"net/http"
@@ -11,8 +10,7 @@ import (
 
 // CartHandler handles cart-related requests
 type CartHandler struct {
-	Store   repo.CartStore
-	CartSvc service.CartService
+	CartSvc *service.CartService
 }
 
 // AddToCart handles adding an item to the user's cart
@@ -31,7 +29,7 @@ func (h *CartHandler) AddToCart(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Add item to cart for the user
-	updatedCart := h.Store.AddItemToCart(userID, item)
+	updatedCart := h.CartSvc.Store.AddItemToCart(userID, item)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(updatedCart)
 }
